@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RSA Key Generator - WhatsApp Flow</title>
+  <style>
+    body {
+      font-family: "Inter", sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to bottom right, #ecfdf5, #eff6ff);
+      color: #111827;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 40px auto;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      padding: 40px;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .header-icon {
+      background: #16a34a;
+      padding: 12px;
+      border-radius: 12px;
+      color: white;
+      font-size: 24px;
+    }
+
+    .header h1 {
+      font-size: 28px;
+      margin: 0;
+      font-weight: 700;
+    }
+
+    .header p {
+      color: #4b5563;
+      margin: 4px 0 0 0;
+    }
+
+    .card {
+      text-align: center;
+      background: #eff6ff;
+      border-radius: 16px;
+      padding: 40px;
+      margin-bottom: 24px;
+    }
+
+    .card h2 {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .card p {
+      color: #4b5563;
+      margin-bottom: 24px;
+    }
+
+    ul {
+      text-align: left;
+      max-width: 450px;
+      margin: 0 auto 24px;
+      padding-left: 0;
+      list-style: none;
+    }
+
+    li {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      color: #374151;
+      margin-bottom: 8px;
+    }
+
+    li span:first-child {
+      color: #16a34a;
+      font-weight: bold;
+    }
+
+    .button {
+      background: #16a34a;
+      color: white;
+      padding: 14px 30px;
+      font-weight: 600;
+      font-size: 16px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+    }
+
+    .button:hover {
+      background: #15803d;
+      transform: scale(1.03);
+    }
+
+    .button:disabled {
+      background: #9ca3af;
+      cursor: not-allowed;
+    }
+
+    .key-box {
+      border: 2px solid #bbf7d0;
+      background: #f0fdf4;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 24px;
+      display: none;
+    }
+
+    .key-box.red {
+      border: 2px solid #fecaca;
+      background: #fef2f2;
+    }
+
+    .key-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .key-header h3 {
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0;
+    }
+
+    .step {
+      padding: 4px 10px;
+      border-radius: 8px;
+      color: white;
+      font-size: 12px;
+    }
+
+    .step.green { background: #16a34a; }
+    .step.red { background: #dc2626; }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .actions button {
+      border: 1px solid #d1d5db;
+      background: white;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .actions button:hover {
+      background: #f9fafb;
+    }
+
+    pre {
+      background: white;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      padding: 16px;
+      font-size: 12px;
+      font-family: monospace;
+      color: #1f2937;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .note {
+      margin-top: 8px;
+      background: white;
+      border-radius: 8px;
+      border: 1px solid #86efac;
+      padding: 10px;
+      font-size: 14px;
+      color: #374151;
+    }
+
+    .note.red {
+      border-color: #fca5a5;
+      color: #b91c1c;
+    }
+
+    .next-steps {
+      background: #eff6ff;
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 24px;
+      display: none;
+    }
+
+    .generate-new {
+      width: 100%;
+      background: #4b5563;
+      color: white;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+      display: none;
+    }
+
+    .generate-new:hover {
+      background: #374151;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="header-icon">🔑</div>
+      <div>
+        <h1>RSA Key Generator</h1>
+        <p>For WhatsApp Flow Encryption</p>
+      </div>
+    </div>
+
+    <div class="card" id="introCard">
+      <h2>Generate Your Key Pair</h2>
+      <p>You need to generate a public/private key pair for WhatsApp Flow encryption.</p>
+      <ul>
+        <li><span>✓</span> Public key: Upload to WhatsApp Business Manager</li>
+        <li><span>✓</span> Private key: Store securely in your backend/Lambda</li>
+        <li><span>✓</span> Keys are generated in your browser (secure)</li>
+      </ul>
+      <button id="generateBtn" class="button">Generate Key Pair</button>
+    </div>
+
+    <div class="key-box" id="publicBox">
+      <div class="key-header">
+        <h3><span class="step green">1</span> Public Key (Upload to WhatsApp)</h3>
+        <div class="actions">
+          <button id="copyPublic">📋 Copy</button>
+          <button id="downloadPublic">⬇️ Download</button>
+        </div>
+      </div>
+      <pre id="publicKey"></pre>
+      <div class="note">
+        <strong>Next step:</strong> Copy this public key and upload it to WhatsApp Business Manager.
+      </div>
+    </div>
+
+    <div class="key-box red" id="privateBox">
+      <div class="key-header">
+        <h3><span class="step red">2</span> Private Key (Keep Secret!)</h3>
+        <div class="actions">
+          <button id="copyPrivate">📋 Copy</button>
+          <button id="downloadPrivate">⬇️ Download</button>
+        </div>
+      </div>
+      <pre id="privateKey"></pre>
+      <div class="note red">
+        ⚠️ <strong>Security Warning:</strong> Store this private key securely. Never share it or commit it to GitHub.
+      </div>
+    </div>
+
+    <button class="generate-new" id="generateNew">Generate New Keys</button>
+
+    <div class="next-steps" id="nextSteps">
+      <h3>📋 Next Steps:</h3>
+      <ol>
+        <li><strong>1.</strong> Copy the Public Key (green box above)</li>
+        <li><strong>2.</strong> Go to WhatsApp Manager → Flow → Endpoint Setup → “Sign public key” section</li>
+        <li><strong>3.</strong> Paste your public key or upload the file</li>
+        <li><strong>4.</strong> Save the Private Key (red box)</li>
+        <li><strong>5.</strong> Update your Lambda with the private key</li>
+      </ol>
+    </div>
+  </div>
+
+  <script>
+    const generateBtn = document.getElementById("generateBtn");
+    const generateNew = document.getElementById("generateNew");
+    const introCard = document.getElementById("introCard");
+    const publicBox = document.getElementById("publicBox");
+    const privateBox = document.getElementById("privateBox");
+    const nextSteps = document.getElementById("nextSteps");
+
+    const publicKeyEl = document.getElementById("publicKey");
+    const privateKeyEl = document.getElementById("privateKey");
+
+    const copyPublic = document.getElementById("copyPublic");
+    const copyPrivate = document.getElementById("copyPrivate");
+    const downloadPublic = document.getElementById("downloadPublic");
+    const downloadPrivate = document.getElementById("downloadPrivate");
+
+    function arrayBufferToPem(buffer, label) {
+      const base64 = btoa(String.fromCharCode(...new Uint8Array(buffer)));
+      const formatted = base64.match(/.{1,64}/g).join('\n');
+      return `-----BEGIN ${label}-----\n${formatted}\n-----END ${label}-----`;
+    }
+
+    async function generateKeys() {
+      generateBtn.disabled = true;
+      generateBtn.textContent = "Generating Keys...";
+
+      try {
+        const keyPair = await crypto.subtle.generateKey(
+          {
+            name: "RSA-OAEP",
+            modulusLength: 2048,
+            publicExponent: new Uint8Array([1, 0, 1]),
+            hash: "SHA-256"
+          },
+          true,
+          ["encrypt", "decrypt"]
+        );
+
+        const publicKey = await crypto.subtle.exportKey("spki", keyPair.publicKey);
+        const privateKey = await crypto.subtle.exportKey("pkcs8", keyPair.privateKey);
+
+        const publicPem = arrayBufferToPem(publicKey, "PUBLIC KEY");
+        const privatePem = arrayBufferToPem(privateKey, "PRIVATE KEY");
+
+        publicKeyEl.textContent = publicPem;
+        privateKeyEl.textContent = privatePem;
+
+        introCard.style.display = "none";
+        publicBox.style.display = "block";
+        privateBox.style.display = "block";
+        generateNew.style.display = "block";
+        nextSteps.style.display = "block";
+
+      } catch (error) {
+        alert("Error generating keys: " + error.message);
+      } finally {
+        generateBtn.disabled = false;
+        generateBtn.textContent = "Generate Key Pair";
+      }
+    }
+
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        alert("Copied to clipboard!");
+      });
+    }
+
+    function downloadKey(content, filename) {
+      const blob = new Blob([content], { type: "text/plain" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    generateBtn.addEventListener("click", generateKeys);
+    generateNew.addEventListener("click", () => location.reload());
+    copyPublic.addEventListener("click", () => copyToClipboard(publicKeyEl.textContent));
+    copyPrivate.addEventListener("click", () => copyToClipboard(privateKeyEl.textContent));
+    downloadPublic.addEventListener("click", () => downloadKey(publicKeyEl.textContent, "public_key.pem"));
+    downloadPrivate.addEventListener("click", () => downloadKey(privateKeyEl.textContent, "private_key.pem"));
+  </script>
+</body>
+</html>
